@@ -39,7 +39,7 @@ export function RoutesMap() {
             const center = getCenter(o.centerId);
             const color = statusColor[o.status];
             return (
-              <g key={o.id}>
+              <div key={o.id} style={{ display: "contents" }}>
                 <Polyline
                   positions={[[center.lat, center.lng], [o.destination.lat, o.destination.lng]]}
                   pathOptions={{ color, weight: 1, opacity: 0.25, dashArray: "4 6" }}
