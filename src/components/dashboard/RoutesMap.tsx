@@ -39,7 +39,7 @@ export function RoutesMap() {
             const center = getCenter(o.centerId);
             const color = statusColor[o.status];
             return (
-              <div key={o.id} style={{ display: "contents" }}>
+              <Fragment key={o.id}>
                 <Polyline
                   positions={[[center.lat, center.lng], [o.destination.lat, o.destination.lng]]}
                   pathOptions={{ color, weight: 1, opacity: 0.25, dashArray: "4 6" }}
@@ -60,7 +60,7 @@ export function RoutesMap() {
                     </div>
                   </Popup>
                 </CircleMarker>
-              </g>
+              </Fragment>
             );
           })}
         </MapContainer>
