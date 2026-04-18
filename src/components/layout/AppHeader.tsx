@@ -1,9 +1,10 @@
-import { Search, Bell } from "lucide-react";
+import { Search, Bell, LogOut } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useFilters } from "@/context/FiltersContext";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 const titleMap: Record<string, { title: string; subtitle: string }> = {
   "/": { title: "Operaciones", subtitle: "Vista global de la cadena de suministro en tiempo real" },
@@ -15,7 +16,14 @@ const titleMap: Record<string, { title: string; subtitle: string }> = {
 export function AppHeader() {
   const { search, setSearch } = useFilters();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
   const meta = titleMap[pathname] ?? titleMap["/"];
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-border bg-background/85 backdrop-blur-md">
@@ -40,6 +48,16 @@ export function AppHeader() {
             <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-status-danger animate-pulse-soft" />
           </button>
           <ThemeToggle />
+          {/* Logout button */}
+          <button
+            id="logout-button"
+            onClick={handleLogout}
+            title={`Cerrar sesión (${user})`}
+            className="flex items-center gap-1.5 h-9 px-3 rounded-lg border border-border bg-background text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-all duration-200"
+          >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">Salir</span>
+          </button>
         </div>
       </div>
     </header>
