@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { useFilters } from "@/context/FiltersContext";
 
 const sevColor = {
   low: "hsl(var(--status-warning))",
@@ -14,19 +15,34 @@ const sevColor = {
 const sevLabel = { low: "Baja", medium: "Media", high: "Alta" } as const;
 
 export default function Incidents() {
-  const total = incidents.length;
-  const resolved = incidents.filter((i) => i.resolved).length;
-  const high = incidents.filter((i) => i.severity === "high").length;
-  const resolutionRate = ((resolved / total) * 100).toFixed(0);
+  const { search } = useFilters();
+  const orderMap = useMemo(() => Object.fromEntries(orders.map((o) => [o.id, o])), []);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return incidents;
+    return incidents.filter((i) => {
+      const o = orderMap[i.orderId];
+      return (
+        i.id.toLowerCase().includes(q) ||
+        i.orderId.toLowerCase().includes(q) ||
+        (o && o.customer.toLowerCase().includes(q))
+      );
+    });
+  }, [search, orderMap]);
+
+  const total = filtered.length;
+  const resolved = filtered.filter((i) => i.resolved).length;
+  const high = filtered.filter((i) => i.severity === "high").length;
+  const resolutionRate = total ? ((resolved / total) * 100).toFixed(0) : "0";
 
   const byType = useMemo(() => {
     const m: Record<string, number> = {};
-    incidents.forEach((i) => (m[i.type] = (m[i.type] ?? 0) + 1));
+    filtered.forEach((i) => (m[i.type] = (m[i.type] ?? 0) + 1));
     return Object.entries(m).map(([type, count]) => ({ type, count })).sort((a, b) => b.count - a.count);
-  }, []);
+  }, [filtered]);
 
-  const orderMap = useMemo(() => Object.fromEntries(orders.map((o) => [o.id, o])), []);
-  const recent = [...incidents].sort((a, b) => new Date(b.reportedAt).getTime() - new Date(a.reportedAt).getTime()).slice(0, 30);
+  const recent = [...filtered].sort((a, b) => new Date(b.reportedAt).getTime() - new Date(a.reportedAt).getTime()).slice(0, 30);
 
   return (
     <div className="space-y-6">
