@@ -1,7 +1,7 @@
 import { MapContainer, TileLayer, CircleMarker, Popup, Polyline } from "react-leaflet";
 import { useFilters } from "@/context/FiltersContext";
 import { getCarrier, getCenter, statusColor, statusLabel } from "@/data/mockData";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 
 export function RoutesMap() {
   const { filteredOrders } = useFilters();
